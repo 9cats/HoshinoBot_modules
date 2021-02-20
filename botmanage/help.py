@@ -16,7 +16,7 @@ TOP_MANUAL = '''
 [帮助pcr订阅]
 
 更多详情可查看github仓库
-XCWBot项目仓库: https://github.com/9cats/HoshinoBot_modules
+XCWBot项目仓库: github.com/9cats/HoshinoBot_modules
 ========
 ※给我点鼓励吧，做不下去了/(ㄒoㄒ)/
 '''.strip()
