@@ -1,13 +1,10 @@
-# VPS搭建部署 HoshinoBot 与 yobot
-闲着用VPS搭建一个qq机器人
-(安全性未知/概率性暴毙/购买的VPS便宜性能较差且未翻越GFW)
+# HoshinoBot插件库
+个人整理的HoshinoBot插件库，方便管理
 ## 主要参考
 ### 参考文章
  [Linux 下部署一个公主连结 qq 群聊机器人](https://cn.pcrbot.com/deploy-a-priconne-bot-on-linux/)
 ### 常用站点
 [pcrbot](https://cn.pcrbot.com/)
-
-[yobot](https://yobot.win/)
 
 [HoshinoBot](https://github.com/Ice-Cirno/HoshinoBot)
 
@@ -15,16 +12,19 @@
 
 [HoshinoBot插件索引](https://github.com/pcrbot/HoshinoBot-plugins-index)
 
-## yobot功能
-[yobot官方介绍](https://yobot.win/features/)（注：我删除了部分插件，部分插件不生效）
 ## HoshinoBot插件
 | 插件 | 名称 | 作用 |
 | ---- | --- | ---- |
+| botmanage | 机器人管理 | 提醒/广播/清理图片/反馈/取码/邀请入群/退群/帮助/功能列表/服务端信息 |
+| dice | 掷骰子 | 产生随机结果 |
+| groupmaster | 群管理 | 自定义回复/入群通知/随机复读 |
+| mikan | 追番 | mikan番剧订阅 |
+| pcrclanbattle | 会战工具 | 机器人提供会战工具使用 |
+| priconne | 一个整合modules | 抽卡/猜头像/信息查询/切噜/jjc查询 |
 | Rua | 搓你 | 发送一张搓群友头像的gif图片 |
 | feedback | 反馈 | 向HoshinoBot发送反馈信息 |
 | aircon | 群空调 | 通过比较科学的算法来得到群活跃度 |
 | antiqks | 骑空士的阴谋 | 揭发群友的阴谋 |
-| dice | 掷骰子 | 产生随机结果 |
 | gacha | 模拟抽卡 | 别看了，井田人竟是我自己 |
 | pcr-avatar-guess | 猜头像 | 优衣你不识得？ |
 | pcr-cherugo | 切噜 | 切啰巴切拉切蹦切蹦 |
@@ -43,66 +43,32 @@
 
 关于只有我的涩图插件在更新这档事
 
-## 各插件指令相关详情
+## 各插件可用指令相关详情
 
-### Rua
-### feddback
-### aircon
-### antiqks
+### botmanage
+| 服务 | 命令 | 参数 | 作用 |
+| ---- | --- | ---- | ---- |
+| feedback | 来杯咖啡 | 反馈内容 | 向hoshino开发组发送反馈信息 |
+| data_cleaner | 清理数据 | 无 | 清理图片数据 |
+| help | help/帮助 | 无 | 显示帮助菜单 |
+| service_manage | enable(disable) | 服务名 | 启用(禁用)服务 |
 ### dice
-### gache
-### pcr-avatar-guess
-### pcr-cherugo
-### pcr-comic
-### pcr-desc-guess
-### pcr-login-bouns
-### pcr-news-bili
-### pcr-news-tw
-### pcr-query
-### pcr-query
-### random-repeater
-### setu_mix
-### sleeping-set
-### chat
+| 服务 | 命令 | 参数 | 作用 |
+| ---- | --- | ---- | ---- |
+| dice | .r | [n d m] | 产生(random(1,6))[n*(1,m+1)]的随机数 |
+### groupmaster
+无可用命令
+### mikan
+| 服务 | 命令 | 参数 | 作用 |
+| ---- | --- | ---- | ---- |
+| mikan | 来点新番 | 无 | 订阅新番 |
+### pcrclanbattle
+请参考[会战机器人功能](https://github.com/9cats/HoshinoBot_modules/blob/master/pcrclanbattle/clanbattle/README.md)
+### priconne
 
-## 移植注意
-
-### 项目目录：
-* Pcrbot
-  * Hoshino
-    * hoshino
-    * res （资源）
-      * gacha （抽卡音效）
-      * HARU （野中晴语言包）
-      * hayasaka （早坂爱语言包）
-      * MEGUMIN （惠惠语言包）
-      * pcrwarn （黑猫语言包）
-      * record （小仓唯语言包）
-      * img （图库）
-    * <font color="#06f090">log（Hoshino数据）</font>
-    * LICENSE
-    * requirements.txt
-    * run.py
-  * yobot
-    * src
-      * client
-        * <font color="#06f090">yobot_data（yobot数据）</font>
-        * other
-    * script
-    * docs
-    * LICENSE
-    * __init.py
-  * gocqhttp
-    * go-cqhttp
-    * <font color="#06f090">data（QQ数据）</font>
-    * <font color="#06f090">logs（日志文件）</font>
-    * <font color="#f65060">config.hjson</font>（配置文件）  
-    * <font color="#f65060">device.json</font>（配置文件） 
-  
-
-### 别又忘了随机生成的密钥
-| 加密中的各值 |  最常见的一种加密算法    |
-|:--------:| -------------:|
-|TOKEN| XXXXXXXXXXXXXXXX|
-|KEY| IAMADIDI|
-|RESULT| U2FsdGVkX1+fWk0SDQFei0u6SIv9h2HNPQDrpDS43VSd9raE1WCDWoxSfqaPjSmG|
+| 服务 | 命令 | 参数 | 作用 |
+| ---- | --- | ---- | ---- |
+| gacha | 来一井 | 无 | 抽卡 |
+| avatar_guess | 猜头像 | 无 | 猜头像 |
+| desc_guess | 猜角色 | 无 | 猜角色 |
+(信息查询/JJC查询/切噜/没有加上)
