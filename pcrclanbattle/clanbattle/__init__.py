@@ -9,8 +9,14 @@ from hoshino.typing import *
 from .argparse import ArgParser
 from .exception import *
 
-sv = Service('clanbattle')
+sv = Service('clanbattle', bundle='pcr会战', help_='输入[!帮助]查看命令')
 SORRY = 'ごめんなさい！嘤嘤嘤(〒︿〒)'
+
+sv = Service('pcr-cherugo', bundle='pcr娱乐', help_='''
+[切噜一下] 转换为切噜语
+[切噜～♪切啰巴切拉切蹦切蹦] 切噜语翻译
+'''.strip())
+
 
 _registry:Dict[str, Tuple[Callable, ArgParser]] = {}
 
