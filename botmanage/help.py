@@ -15,10 +15,9 @@ TOP_MANUAL = '''
 [帮助pcr娱乐]
 [帮助pcr订阅]
 
-更多详情可查看github仓库
-XCWBot项目仓库: github.com/9cats/HoshinoBot_modules
+指令详情可查看github仓库:
+github.com/9cats/HoshinoBot_modules
 ========
-※给我点鼓励吧，做不下去了/(ㄒoㄒ)/
 '''.strip()
 
 def gen_bundle_manual(bundle_name, service_list, gid):
