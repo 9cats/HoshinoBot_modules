@@ -63,17 +63,27 @@
 @某人并加上"rua"，就能让机器人发送一个挫头像的gif图
 ### setu_renew
 来 [num] 张 [keyword] 涩/色/瑟图 : 来num张keyword的涩图 (不指定数量与关键字发送一张随机涩图)
+
 涩/色/瑟图 : 发送一张随机涩图
+
 本日涩图排行榜 [page] : 获取[第page页]p站排行榜(需开启acggov模块)
+
 看涩图 [n] 或 [start end] : 获取p站排行榜[第n名/从start名到end名]色图(需开启acggov模块)
+
 提取图片 pid : 获取指定pid的图片,若本地有则会直接发送,否则将给出原图链接.
 ### rss
 rss help : 查看帮助
+
 rss add rss地址 : 添加rss订阅,需使用完整rss订阅网址.
+
 rss addb up主id 或 rss add-bilibili up主id : 添加b站up主订阅
+
 rss addr route 或 rss add-route route : 添加rsshub route订阅, route请查询rsshub文档.
+
 rss list : 查看订阅列表
+
 rss rm 序号 或 rss remove 序号 : 删除订阅列表指定项
+
 rss mode 模式id : 设置推送消息模式 0=标准模式(默认),推送消息包含详情及图片 1=简略模式,推送消息仅包含标题
 ### xcw
 @xcw并加上"骂我"，然后你就是hentai了
