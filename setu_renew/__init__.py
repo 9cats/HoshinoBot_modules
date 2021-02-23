@@ -16,7 +16,7 @@ sv = hoshino.Service('涩图', bundle='pcr娱乐', help_=HELP_MSG)
 config_default = {
     "base": {
         "daily_max": 20, #每日上限次数
-        "freq_limit": 300, #频率限制
+        "freq_limit": 5, #频率限制
         "whitelistmode": False, #白名单模式开关
         "blacklistmode": False, #黑名单模式开关
         "ban_if_group_num_over": 3000, #字面意思
