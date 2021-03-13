@@ -12,7 +12,6 @@ import os
 from hoshino import R
 from PIL import Image
 from .config import get_config
-import hoshino
 
 if sys.platform == 'win32':
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
@@ -23,7 +22,7 @@ ranking_date = None
 
 acggov_headers = {
     'token': get_config('acggov', 'apikey'),
-    'referer': 'https://api.acgmx.com/'
+    'referer': 'https://www.acgmx.com/'
     }
 
 native_info = {}
@@ -49,7 +48,7 @@ def load_native_info(sub_dir):
                 info[uid] = ','.join(d['tags'])
         except:
             pass
-    print('[INFO]read', len(info), 'setu from', sub_dir)
+    print('read', len(info), 'setu from', sub_dir)
     return info
 
 def generate_image_struct():
@@ -158,7 +157,7 @@ async def query_search(keyword):
             pass
         if image['url']:
             image_list.append(image)
-    print('[INFO]搜索结果数量', len(data['illusts']))
+    print('搜索结果数量', len(data['illusts']))
     return image_list
 
 
@@ -214,7 +213,7 @@ async def query_ranking_setu(number: int) -> (int, str):
     return image
 
 async def download_acggov_image(url: str):
-    print('[INFO]acggov downloading image', url)
+    print('acggov downloading image', url)
     try:
         async with aiohttp.ClientSession(headers=acggov_headers) as session:
             async with session.get(url, proxy=get_config('acggov', 'acggov_proxy')) as resp:
@@ -228,12 +227,12 @@ async def download_acggov_image(url: str):
                 roiImg.save(imgByteArr, format='JPEG')
                 return imgByteArr.getvalue()
     except :
-        print('[ERROR]download image failed')
+        print('download image failed')
         #traceback.print_exc()
     return None
 
 async def download_pixiv_image(url: str, id):
-    print('[INFO]acggov downloading pixiv image', url)
+    print('acggov downloading pixiv image', url)
     headers = {
         'referer': f'https://www.pixiv.net/member_illust.php?mode=medium&illust_id={id}'
         }
@@ -250,7 +249,7 @@ async def download_pixiv_image(url: str, id):
                 roiImg.save(imgByteArr, format='JPEG')
                 return imgByteArr.getvalue()
     except :
-        print('[ERROR]download image failed')
+        print('download image failed')
         #traceback.print_exc()
     return None
 
@@ -277,7 +276,8 @@ async def get_setu_online():
     path = f'setu_mix/acggov/{image["id"]}.jpg'
     res = R.img(path)
     if os.path.exists(res.path):
-            image['data'] = res.path
+        with open(res.path, 'rb') as f:
+            image['data'] = f.read()
             image['native'] = True
     else:
         image['data'] = await download_acggov_image(image['url'])
@@ -288,7 +288,6 @@ async def get_setu_online():
             return image
         if get_config('acggov', 'mode') == 2:
             save_image(image)
-            image['data'] = res.path
     return image
 
 def get_setu_native(uid = 0):
@@ -313,7 +312,8 @@ def get_setu_native(uid = 0):
     path = f'setu_mix/acggov/{uid}'
     res = R.img(path)
     try:
-        image['data'] = res.path+'.jpg'
+        with open(res.path + '.jpg', 'rb') as f:
+            image['data'] = f.read()
         with open(res.path + '.json', encoding='utf8') as f:
             d = json.load(f)
             for k,v in d.items():
@@ -332,8 +332,9 @@ async def search_setu_online(keyword, num):
         path = f'setu_mix/acggov/{image["id"]}.jpg'
         res = R.img(path)
         if os.path.exists(res.path):
-            image['data'] = res.path
-            image['native'] = True
+            with open(res.path, 'rb') as f:
+                image['data'] = f.read()
+                image['native'] = True
         else:
             url = image['url']
             if get_config('acggov', 'pixiv_direct'):
@@ -345,7 +346,6 @@ async def search_setu_online(keyword, num):
             if image['data']:
                 if get_config('acggov', 'mode') == 2:
                     save_image(image)
-                    image['data'] = res.path
         if image['data']:
             valid_list.append(image)
         if len(valid_list) >= num:
@@ -408,7 +408,8 @@ async def acggov_get_ranking_setu(number: int) -> (int, str):
     path = f'setu_mix/acggov/{image["id"]}.jpg'
     res = R.img(path)
     if os.path.exists(res.path):
-            image['data'] = res.path
+        with open(res.path, 'rb') as f:
+            image['data'] = f.read()
             image['native'] = True
     else:
         url = image['url']
@@ -423,7 +424,6 @@ async def acggov_get_ranking_setu(number: int) -> (int, str):
             image['title'] = '图片下载失败'
         elif get_config('acggov', 'mode') == 2:
             save_image(image)
-            image['data'] = res.path
 
     return image
         
@@ -431,13 +431,13 @@ async def acggov_get_ranking_setu(number: int) -> (int, str):
 async def acggov_fetch_process():
     global ranking_date
     if get_config('acggov', 'mode') == 2:
-        print('[INFO]fetch acggov setu')
+        print('fetch acggov setu')
         for _ in range(10):
             await get_setu_online()
 
         date = (datetime.datetime.now() + datetime.timedelta(days=-2)).strftime("%Y-%m-%d")
         if date != ranking_date:
-            print('[INFO]fetch acggov ranking setu')
+            print('fetch acggov ranking setu')
             for i in range(25):
                 await acggov_get_ranking_setu(i)
             ranking_date = date

@@ -1,4 +1,3 @@
-import asyncio
 import os
 import json
 import traceback
@@ -8,8 +7,7 @@ import random
 import datetime
 from PIL import Image
 from hoshino import R
-from .config import get_config,get_api_num, key_vaildable_query,set_key_invaild
-import hoshino
+from .config import get_config
 
 quota_limit_time = datetime.datetime.now()
 
@@ -27,7 +25,6 @@ def generate_image_struct():
 
 native_info = {}
 native_r18_info = {}
-
 
 def load_native_info(sub_dir):
     info = {}
@@ -50,21 +47,20 @@ def load_native_info(sub_dir):
                 info[uid] = ','.join(d['tags'])
         except:
             pass
-    print('[INFO]read', len(info), 'setu from', sub_dir)
+    print('read', len(info), 'setu from', sub_dir)
     return info
 
 #获取随机色图
 async def query_setu(r18 = 0, keyword=None):
     global quota_limit_time
     image_list = []
-    apikey = get_config('lolicon', 'apikey')
-    if not key_vaildable_query:
+    if datetime.datetime.now() < quota_limit_time:
         return image_list
 
     data = {}
     url = 'https://api.lolicon.app/setu'
     params = {
-        'apikey': apikey,
+        'apikey': get_config('lolicon', 'apikey'),
         'r18': r18,
         'num': 10,
         }
@@ -77,7 +73,7 @@ async def query_setu(r18 = 0, keyword=None):
 
     try:
         async with aiohttp.ClientSession() as session:
-            async with session.get(url, params=params, proxy=get_config('lolicon', 'lolicon_proxy')) as resp:
+            async with session.get(url, params=params) as resp:
                 data = await resp.json(content_type='application/json')
     except Exception:
         traceback.print_exc()
@@ -85,12 +81,10 @@ async def query_setu(r18 = 0, keyword=None):
     if 'code' not in data:
         return image_list
     if data['code'] != 0:
-        print('[ERROR]lolicon api error:', data['code'], ',msg:', data['msg'])
+        print('lolicon api error code:', data['code'], ',msg:', data['msg'])
         if data['code'] == 429:
-            quota_limit_time = datetime.datetime.now(
-            ) + datetime.timedelta(seconds=data['quota_min_ttl'])
-            print(f'[ERROR]lolicon api 已到达本日调用额度上限，次数+1时间：{quota_limit_time}s')
-            set_key_invaild(apikey, quota_limit_time)
+            print('lolicon api 已到达本日调用额度上限')
+            quota_limit_time = datetime.datetime.now() + datetime.timedelta(seconds=data['quota_min_ttl'])
         return image_list
     for item in data['data']:
         image = generate_image_struct()
@@ -104,10 +98,10 @@ async def query_setu(r18 = 0, keyword=None):
     return image_list
 
 async def download_image(url: str):
-    print('[INFO]lolicon downloading image', url)
+    print('lolicon downloading image', url)
     try:
         async with aiohttp.ClientSession() as session:
-            async with session.get(url, proxy=get_config('lolicon', 'lolicon_proxy')) as resp:
+            async with session.get(url) as resp:
                 data = await resp.read()
                 #转jpg
                 byte_stream = io.BytesIO(data)
@@ -118,12 +112,12 @@ async def download_image(url: str):
                 roiImg.save(imgByteArr, format='JPEG')
                 return imgByteArr.getvalue()
     except :
-        print('[ERROR]download image failed')
+        print('download image failed')
         #traceback.print_exc()
     return None
 
 async def download_pixiv_image(url: str, id):
-    print('[INFO]lolicon downloading pixiv image', url)
+    print('lolicon downloading pixiv image', url)
     headers = {
         'referer': f'https://www.pixiv.net/member_illust.php?mode=medium&illust_id={id}'
         }
@@ -140,7 +134,7 @@ async def download_pixiv_image(url: str, id):
                 roiImg.save(imgByteArr, format='JPEG')
                 return imgByteArr.getvalue()
     except :
-        print('[ERROR]download image failed')
+        print('download image failed')
         #traceback.print_exc()
     return None
 
@@ -162,16 +156,9 @@ def save_image(image):
     }
     with open(res.path, 'w', encoding='utf8') as f:
         json.dump(info, f, ensure_ascii=False, indent=2)
-    
 
 async def get_setu_online(num, r18 = 0, keyword = None):
     image_list = await query_setu(r18 = r18, keyword = keyword)
-    if get_api_num() != 1:
-        while image_list == None:
-            image_list = await query_setu(r18 = r18, keyword = keyword)
-    else:
-        if image_list == None:
-            return
     valid_list = []
 
     while len(image_list) > 0:
@@ -179,10 +166,11 @@ async def get_setu_online(num, r18 = 0, keyword = None):
         #检查本地是否存在该图片
         path = f'setu_mix/lolicon/{image["id"]}.jpg'
         if image['r18']:
-            path = f'setu_mix/lolicon_r18/{image["id"]}.jpg'
+            path = f'setu_mix/lolicon_r18/{image["id"]}'
         res = R.img(path)
         if os.path.exists(res.path):
-                image['data'] = res.path
+            with open(res.path, 'rb') as f:
+                image['data'] = f.read()
                 image['native'] = True
         else:
             if get_config('lolicon', 'pixiv_direct'):
@@ -192,7 +180,6 @@ async def get_setu_online(num, r18 = 0, keyword = None):
             image['native'] = False
             if image['data'] and get_config('lolicon', 'mode') == 2:
                 save_image(image)
-                image['data'] = res.path
         if image['data']:
             valid_list.append(image)
         if len(valid_list) >= num:
@@ -226,15 +213,14 @@ def get_setu_native(r18 = 0, uid = 0):
     path += f'/{uid}'
     res = R.img(path)
     try:
-        image['data'] = res.path+'.jpg'
+        with open(res.path + '.jpg', 'rb') as f:
+            image['data'] = f.read()
         with open(res.path + '.json', encoding='utf8') as f:
             d = json.load(f)
             if 'title' in d:
                 image['title'] = d['title']
             if 'author' in d:
                 image['author'] = d['author']
-            if 'url' in d:
-                image['url'] = d['url']
     except:
         pass
     
@@ -289,10 +275,10 @@ async def lolicon_search_setu(keyword, r18, num):
 
 async def lolicon_fetch_process():
     if get_config('lolicon', 'mode') == 2:
-        print('[INFO]fetch lolicon setu')
+        print('fetch lolicon setu')
         await get_setu_online(10, 0)
         if get_config('lolicon', 'r18'):
-            print('[INFO]fetch lolicon r18 setu')
+            print('fetch lolicon r18 setu')
             await get_setu_online(10, 1)
 
 def lolicon_init():
